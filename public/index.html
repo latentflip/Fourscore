@@ -23,10 +23,10 @@
             height: 13px;
             background-color: cyan;
           }
-          .piece.player1 {
+          .piece.dog {
             background-image: url(../img/icon-dog.png);
           }
-          .piece.player2 {
+          .piece.whale {
             background-image: url(../img/icon-whale.png);
           }
           .piece.player1.player2 {
@@ -35,10 +35,6 @@
         </style>
         <script src="js/jquery.1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
-        <!-- 
-            jQTouch Clock Demo
-            All custom code is embedded below:
-        -->
         <script type="text/javascript" charset="utf-8">
             $.jQTouch({
                 icon: 'icon.png',
@@ -54,8 +50,12 @@
                 $('#cribbageBoard #piece0').addClass($(this).attr('id'));
               });
               
-
-              $('.up').click(function() {
+              function movePiece(player, amount) {
+                var score = parseInt(player.find('.score').text());
+                score = score + amount;
+                
+              }
+              $('.up').live('click', function() {
                 var oldScore = parseInt($(this).siblings('.score').text());
                 oldScore = oldScore + 1;
                 if (oldScore > 120) {
@@ -63,11 +63,13 @@
                   $('.up, .down').hide();
                 } else {
                   $(this).siblings('.score').text(oldScore);
-                  $('#cribbageBoard .piece').removeClass($(this).parent().attr('id'));
-                  $('#cribbageBoard #piece'+oldScore).addClass($(this).parent().attr('id'));
+                  $('#cribbageBoard .piece').removeClass($(this).parent().data('piece'));
+                  $('#cribbageBoard #piece'+oldScore).addClass($(this).parent().data('piece'));
                 }
               });
-              $('.down').click(function() {
+              
+
+              $('.down').live('click', function() {
                 var oldScore = parseInt($(this).siblings('.score').text());
                 if (oldScore>0) {
                   oldScore = oldScore - 1;
@@ -75,15 +77,29 @@
                 $(this).siblings('.score').text(oldScore);
               });
 
+              function addPlayer(name, piece) {
+                var html = '<li id="player1"><span class="name"></span> - <span class="score">0</span> <span class="up">+</span><span class="down">-</span></li>';
+                var insert = $(html);
+                $('#players').append(
+                  insert.data('piece', piece).find('.name').html(name).end()
+                  );
+              }
+              addPlayer('Hilary', 'dog');
+              $('#addPlayer').submit(function() {
+                addPlayer($('#formName').val(), $('#formPiece').val());
+                $('input').blur();
+                $('#add .cancel').click();
+                this.reset();
+                return false;
+              });
             });
         </script>
     </head>
     <body>
         <div id="home">
             <div class="toolbar">
-                <h1>World Clock</h1>
+                <h1>FourScore</h1>
                 <a href="#info" class="button leftButton flip">Info</a>
-                <a href="#add" class="button add slideup">+</a>
             </div>
             <ul id="games" class="metal">
               <li class="arrow"><a href="#cribbage">Cribbage</a></li>
@@ -92,14 +108,27 @@
         <div id="cribbage">
           <div class="toolbar">
             <h1>Cribbage</h1>
+            <a href="#add" class="button add slideup">+</a>
           </div>
-          <ul id="players" class="metal">
-            <li id="player1"><span class="player">Hilary</span> - <span class="score">0</span> <span class="up">+</span><span class="down">-</span></li>
-            <li id="player2"><span class="player">Phil</span> - <span class="score">0</span> <span class="up">+</span><span class="down">-</span></li>
-          </ul>
-          <div id="cribbageBoard">
-            
+          <ul id="players" class="metal"></ul>
+          <div id="cribbageBoard"></div>
+        </div>
+        <div class="form" id="add">
+          <div class="toolbar">
+            <h1>Add Player</h1>
+            <a href="#add" class="cancel">Cancel</a>
           </div>
+          <form id="addPlayer">
+            <ul class="rounded">
+              <li><input type="text" id="formName" name="formName" placeholder="Player Name"></li>
+              <li><select name="formPiece" id="formPiece">
+                    <option value="dog">Dog</option>
+                    <option value="whale">Whale</option>
+                  </select>
+              </li>
+            </ul>
+            <a href="#" style="margin: 10px;" class="whiteButton submit">Add Player</a>
+          </form>
         </div>
         <div id="info">
             <div class="toolbar">
