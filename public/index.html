@@ -16,6 +16,11 @@
           .down {
             color: red;
           }
+          #winner {
+            width: 26px;
+            height: 26px;
+            margin: 20px;
+          }
           .piece {
             display: inline-block;
             margin: 2px;
@@ -47,34 +52,28 @@
                 $('#cribbageBoard').append('<span class="piece" id="piece'+i+'"></span>');
               }
               $('#players li').each(function(i,E) {
-                $('#cribbageBoard #piece0').addClass($(this).attr('id'));
+                $('#cribbageBoard #piece0').addClass($(E).data('piece'));
               });
               
               function movePiece(player, amount) {
                 var score = parseInt(player.find('.score').text());
                 score = score + amount;
-                
+                if (score < 0) { score = 0; }
+                if (score > 12) { 
+                  score = 120; 
+                  $('#winner').css({'background-image': player.data('piece')});
+                }
+                player.find('.score').text(score);
+                $('#cribbageBoard .piece').removeClass(player.data('piece'));
+                $('#cribbageBoard #piece'+score).addClass(player.data('piece'));
               }
               $('.up').live('click', function() {
-                var oldScore = parseInt($(this).siblings('.score').text());
-                oldScore = oldScore + 1;
-                if (oldScore > 120) {
-                  $(this).siblings('.score').text('Wins!');
-                  $('.up, .down').hide();
-                } else {
-                  $(this).siblings('.score').text(oldScore);
-                  $('#cribbageBoard .piece').removeClass($(this).parent().data('piece'));
-                  $('#cribbageBoard #piece'+oldScore).addClass($(this).parent().data('piece'));
-                }
+                movePiece($(this).parent(), +1);
               });
               
 
               $('.down').live('click', function() {
-                var oldScore = parseInt($(this).siblings('.score').text());
-                if (oldScore>0) {
-                  oldScore = oldScore - 1;
-                }
-                $(this).siblings('.score').text(oldScore);
+                movePiece($(this).parent(), -1);
               });
 
               function addPlayer(name, piece) {
@@ -82,7 +81,8 @@
                 var insert = $(html);
                 $('#players').append(
                   insert.data('piece', piece).find('.name').html(name).end()
-                  );
+                );
+                $('#cribbageBoard #piece0').addClass(piece);
               }
               addPlayer('Hilary', 'dog');
               $('#addPlayer').submit(function() {
@@ -112,6 +112,7 @@
           </div>
           <ul id="players" class="metal"></ul>
           <div id="cribbageBoard"></div>
+          <div id="winner"></div>
         </div>
         <div class="form" id="add">
           <div class="toolbar">
